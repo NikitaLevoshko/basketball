@@ -1,0 +1,230 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+#Введение исходных данных
+print('Введите скорость броска v')
+v = float(input())
+print('Введите угол броска a')
+a = float(input())
+print('Введите рост бросающего h')
+h = float(input())
+print('Введите расстояние до кольца L')
+L = float(input())
+H = 3.05
+R = 0.225
+r = 0.76/np.pi/2
+
+#Часть 1
+arad = a*np.pi/180
+T = (v * np.sin(arad) + np.sqrt((v * np.sin(arad)) * (v * np.sin(arad)) + 2 * 9.8 * h)) / 9.8
+#Tv = (v * np.sin(arad) + np.sqrt((v * np.sin(arad)) * (v * np.sin(arad)) + 2 * 9.8 * (h-H))) / 9.8
+
+#Визуализация броска
+t = np.linspace(0, T, 1000)
+T1 = L/(v*np.cos(arad))
+if (h+v*np.sin(arad)*T1-4.9*T1*T1<=3.05+0.9) and (h+v*np.sin(arad)*T1-4.9*T1*T1>=3.05): # если есть отскок от щита
+    t = np.linspace(0, T1, 1000)
+    x = v * np.cos(arad) * t
+    y = h + v * np.sin(arad) * t - 4.9 * t * t
+    plt.plot(x, y, label="track of ball before the rebound")
+    plt.plot([0 for i in y], y, color="black")  # ось X
+    plt.plot(x, [0 for i in x], color="black")  # ось Y
+    t = np.linspace(T1, T, 1000)
+    x = L-(v * np.cos(arad) * (t-T1))
+    y = h + v * np.sin(arad) * t - 4.9 * t * t
+    plt.plot(x, y, label="trace of ball after the rebound")
+    plt.plot([0 for i in y], y, color="black")  # ось X
+    plt.plot(x, [0 for i in x], color="black")  # ось Y
+    plt.vlines(x=L, ymin=0, ymax=H + 0.9)  # щит
+    plt.hlines(y=H, color='r', xmin=L - 0.15 - 2*R + r, xmax=L - 0.15 - r)  # кольцо влево
+    plt.hlines(y=H, color='r', xmin=L + 0.15 + r, xmax=L + 0.15 + 2*R - r)  # кольцо вправо
+    plt.grid()  # сетка
+    plt.legend(shadow=True)  # легенда
+    plt.show()
+else:  # Если нет отскока от щита
+    x = v*np.cos(arad)*t
+    y = h+v*np.sin(arad)*t-4.9*t*t
+    plt.plot(x, y, label="trace of ball")
+    plt.plot([0 for i in y], y, color="black")  # ось X
+    plt.plot(x, [0 for i in x], color="black") # ось Y
+    plt.vlines(x=L,ymin=0,ymax=H+0.9)  # щит
+    plt.hlines(y = H, color = 'r',xmin = L-0.15-2*R+r,xmax = L-0.15-r) # кольцо влево
+    plt.hlines(y = H, color = 'r',xmin = L+0.15+r,xmax = L+0.15+2*R-r) # кольцо вправо
+    plt.grid()  # сетка
+    plt.legend(shadow=True)  # легенда
+    plt.show()
+
+        # Часть 2
+        # Углы для броска без отскока от щита
+# Первый случай для броска без отскока
+x = np.arange(L-0.15-2*R+r, L-0.15-r, 0.01)
+y = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*x*x/(2*v*v))))/(9.8*x))*180/np.pi
+plt.plot(x,y,color='b',label='Допустимый а для броска без отскока')
+#plt.show()
+min = L-0.15-r
+amin = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*min*min/(2*v*v))))/(9.8*min))*180/np.pi
+max = L-0.15-2*R+r
+amax = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*max*max/(2*v*v))))/(9.8*max))*180/np.pi
+if amin<amax:
+    print('Допустимый угол для первого случая броска без отскока от ',amin,'до',amax)
+else:
+    print('Допустимый угол для первого случая броска без отскока от ', amax, 'до', amin)
+
+# Второй случай для броска без отскока
+x = np.arange(L-0.15-2*R+r, L-0.15-r, 0.01)
+y = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*x*x/(2*v*v))))/(9.8*x))*180/np.pi
+plt.plot(x,y,color='b',label='a')
+#plt.show()
+min = L-0.15-2*R+r
+amin = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*min*min/(2*v*v))))/(9.8*min))*180/np.pi
+max = L-0.15-r
+amax = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*max*max/(2*v*v))))/(9.8*max))*180/np.pi
+if amin<amax:
+    print('Допустимый угол для второго случая броска без отскока от ',amin,'до',amax)
+else:
+    print('Допустимый угол для второго случая броска без отскока от ', amax, 'до', amin)
+
+
+        # Углы для броска с отскоком от щита
+# Первый случай для броска с отскоком
+x = np.arange(L+0.15+r, L+0.15+2*R-r, 0.01)
+y = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*x*x/(2*v*v))))/(9.8*x))*180/np.pi
+plt.plot(x,y,color='b',label='a')
+#plt.show()
+min = L+0.15+2*R-r
+max = L+0.15+r
+bmin = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*L*L/(2*v*v))))/(9.8*L))*180/np.pi # Допустимые углы попадания в щит
+bmax = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-(H+0.9)-9.8*L*L/(2*v*v))))/(9.8*L))*180/np.pi
+amin = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*min*min/(2*v*v))))/(9.8*min))*180/np.pi # Допустимые углы попадания в мнимое кольцо
+amax = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*max*max/(2*v*v))))/(9.8*max))*180/np.pi
+# Перебор возможных расположений углов
+if (bmax>bmin) and (amax>amin) and (bmin<amin):
+    if bmax<amin:
+        print('Нет подходящих углов')
+    if (bmax>amin) and (bmax<amax):
+        print('Допустимый угол для первого случая броска с отскоком от ', amin, 'до', bmax)
+    if (bmax>amin) and (bmax>amax):
+        print('Допустимый угол для первого случая броска с отскоком от ', amin, 'до', amax)
+if (bmax>bmin) and (amax<amin) and (bmin<amax):
+    if bmax<amax:
+        print('Нет подходящих углов')
+    if (bmax>amax) and (bmax<amin) :
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', bmax)
+    if (bmax>amax) and (bmax>amin):
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', amin)
+if (bmax<bmin) and (amax>amin) and (bmax<amin):
+    if bmin<amin:
+        print('Нет подходящих углов')
+    if (bmin>amin) and (bmin<amax):
+        print('Допустимый угол для первого случая броска с отскоком от ', amin, 'до', bmin)
+    if (bmin>amin) and (bmin>amax):
+        print('Допустимый угол для первого случая броска с отскоком от ', amin, 'до', amax)
+if (bmax<bmin) and (amax<amin) and (bmax<amax):
+    if bmin<amax:
+        print('Нет подходящих углов')
+    if (bmin>amax) and (bmin<amin):
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', bmin)
+    if (bmin>amax) and (bmin>amin):
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', amin)
+#--
+if (bmax>bmin) and (amax>amin) and (bmin>amin):
+    if amax<bmin:
+        print('Нет подходящих углов')
+    if (amax>bmin) and (amax<bmax):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmin, 'до', amax)
+    if (amax>bmin) and (amax>bmax):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmin, 'до', bmax)
+if (bmax>bmin) and (amax<amin) and (bmin>amax):
+    if amax<bmax:
+        print('Нет подходящих углов')
+    if (amax>bmax) and (amax<bmin) :
+        print('Допустимый угол для первого случая броска с отскоком от ', bmax, 'до', amax)
+    if (amax>bmax) and (amax>bmin):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmax, 'до', bmin)
+if (bmax<bmin) and (amax>amin) and (bmax>amin):
+    if amin<bmin:
+        print('Нет подходящих углов')
+    if (amin>bmin) and (amin<bmax):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmin, 'до', amin)
+    if (amin>bmin) and (amin>bmax):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmin, 'до', bmax)
+if (bmax<bmin) and (amax<amin) and (bmax>amax):
+    if amin<bmax:
+        print('Нет подходящих углов')
+    if (amin>bmax) and (amin<bmin):
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', bmin)
+    if (amin>bmax) and (amin>bmin):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmax, 'до', bmin)
+#print(bmin,bmax,amin,amax)
+
+
+# Второй случай для броска с отскоком
+x = np.arange(L+0.15+r, L+0.15+2*R-r, 0.01)
+y = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*x*x/(2*v*v))))/(9.8*x))*180/np.pi
+plt.plot(x,y,color='b',label='a')
+#plt.show()
+min = L+0.15+r
+max = L+0.15+2*R-r
+amin = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*min*min/(2*v*v))))/(9.8*min))*180/np.pi # Допустимые углы попадания в мнимое кольцр
+amax = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*max*max/(2*v*v))))/(9.8*max))*180/np.pi
+bmin = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*L*L/(2*v*v))))/(9.8*L))*180/np.pi # Допустимые углы попадания в щит
+bmax = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-(H+0.9)-9.8*L*L/(2*v*v))))/(9.8*L))*180/np.pi
+# Перебор вариантов расположения углов
+if (bmax>bmin) and (amax>amin) and (bmin<amin):
+    if bmax<amin:
+        print('Нет подходящих углов')
+    if (bmax>amin) and (bmax<amax):
+        print('Допустимый угол для первого случая броска с отскоком от ', amin, 'до', bmax)
+    if (bmax>amin) and (bmax>amax):
+        print('Допустимый угол для первого случая броска с отскоком от ', amin, 'до', amax)
+if (bmax>bmin) and (amax<amin) and (bmin<amax):
+    if bmax<amax:
+        print('Нет подходящих углов')
+    if (bmax>amax) and (bmax<amin) :
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', bmax)
+    if (bmax>amax) and (bmax>amin):
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', amin)
+if (bmax<bmin) and (amax>amin) and (bmax<amin):
+    if bmin<amin:
+        print('Нет подходящих углов')
+    if (bmin>amin) and (bmin<amax):
+        print('Допустимый угол для первого случая броска с отскоком от ', amin, 'до', bmin)
+    if (bmin>amin) and (bmin>amax):
+        print('Допустимый угол для первого случая броска с отскоком от ', amin, 'до', amax)
+if (bmax<bmin) and (amax<amin) and (bmax<amax):
+    if bmin<amax:
+        print('Нет подходящих углов')
+    if (bmin>amax) and (bmin<amin):
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', bmin)
+    if (bmin>amax) and (bmin>amin):
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', amin)
+#--
+if (bmax>bmin) and (amax>amin) and (bmin>amin):
+    if amax<bmin:
+        print('Нет подходящих углов')
+    if (amax>bmin) and (amax<bmax):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmin, 'до', amax)
+    if (amax>bmin) and (amax>bmax):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmin, 'до', bmax)
+if (bmax>bmin) and (amax<amin) and (bmin>amax):
+    if amax<bmax:
+        print('Нет подходящих углов')
+    if (amax>bmax) and (amax<bmin) :
+        print('Допустимый угол для первого случая броска с отскоком от ', bmax, 'до', amax)
+    if (amax>bmax) and (amax>bmin):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmax, 'до', bmin)
+if (bmax<bmin) and (amax>amin) and (bmax>amin):
+    if amin<bmin:
+        print('Нет подходящих углов')
+    if (amin>bmin) and (amin<bmax):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmin, 'до', amin)
+    if (amin>bmin) and (amin>bmax):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmin, 'до', bmax)
+if (bmax<bmin) and (amax<amin) and (bmax>amax):
+    if amin<bmax:
+        print('Нет подходящих углов')
+    if (amin>bmax) and (amin<bmin):
+        print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', bmin)
+    if (amin>bmax) and (amin>bmin):
+        print('Допустимый угол для первого случая броска с отскоком от ', bmax, 'до', bmin)
+#print(bmin,bmax,amin,amax)
