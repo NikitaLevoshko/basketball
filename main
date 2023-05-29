@@ -53,6 +53,11 @@ else:  # Если нет отскока от щита
     plt.grid()  # сетка
     plt.legend(shadow=True)  # легенда
     plt.show()
+#if ((L - 0.15 - 2*R + r <= (v * np.cos(arad) * Tv)) and ((v * np.cos(arad) * Tv) <= L-0.15-r)) or \
+        #((L+0.15+r <= (v * np.cos(arad)*Tv)) and ( (v * np.cos(arad)*Tv)<= L+0.15+2*R-r)):
+   # print('Поздравляем! Вы попали!')
+#else:
+    #print('Увы, вы промазали')
 
         # Часть 2
         # Углы для броска без отскока от щита
@@ -62,13 +67,23 @@ y = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*x*x/(2*v*v))))/(9.8*x))*180/
 plt.plot(x,y,color='b',label='Допустимый а для броска без отскока')
 #plt.show()
 min = L-0.15-r
-amin = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*min*min/(2*v*v))))/(9.8*min))*180/np.pi
+if (1+2*9.8/(v*v)*(h-H-9.8*min*min/(2*v*v))) >= 0:
+    amin = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*min*min/(2*v*v))))/(9.8*min))*180/np.pi
+else:
+    amin = np.arctan(v * v * (1 + np.sqrt(1 + 2 * 9.8 / (v * v) * (h - H - 9.8 * min * min / (2 * v * v)))) / (
+                9.8 * min)) * 180 / np.pi
 max = L-0.15-2*R+r
 amax = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*max*max/(2*v*v))))/(9.8*max))*180/np.pi
 if amin<amax:
     print('Допустимый угол для первого случая броска без отскока от ',amin,'до',amax)
 else:
     print('Допустимый угол для первого случая броска без отскока от ', amax, 'до', amin)
+#x = np.arange(5,13,0.1)
+#y = np.arctan(x*x*(1+np.sqrt(1+2*9.8/(x*x)*(h-H-9.8*min*min/(2*x*x))))/(9.8*min))*180/np.pi
+#q = np.arctan(x*x*(1+np.sqrt(1+2*9.8/(x*x)*(h-H-9.8*max*max/(2*x*x))))/(9.8*max))*180/np.pi
+#plt.plot(x,y,color='b',label='Угол от скорости ')
+#plt.plot(x,q,color='r',label='Угол от скорости ')
+#plt.show()
 
 # Второй случай для броска без отскока
 x = np.arange(L-0.15-2*R+r, L-0.15-r, 0.01)
@@ -79,13 +94,30 @@ min = L-0.15-2*R+r
 amin = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*min*min/(2*v*v))))/(9.8*min))*180/np.pi
 max = L-0.15-r
 amax = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*max*max/(2*v*v))))/(9.8*max))*180/np.pi
+acrit = np.arctan(v*v*(1-np.sqrt(1+2*9.8/(v*v)*(h-(H+r)-9.8*max*max/(2*v*v))))/(9.8*max))*180/np.pi
 if amin<amax:
+    if amax>acrit:
+        amax = acrit
     print('Допустимый угол для второго случая броска без отскока от ',amin,'до',amax)
 else:
+    if amin>acrit:
+        amin = acrit
     print('Допустимый угол для второго случая броска без отскока от ', amax, 'до', amin)
+# График допустимой области углов от скорости
+x = np.arange(9,10, 0.05)
+y = np.arctan(x * x * (1 + np.sqrt(1 + 2 * 9.8 / (x * x) * (h - H - 9.8 * min * min / (2 * x * x)))) / (9.8 * min)) * 180 / np.pi
+q = np.arctan(x * x * (1 + np.sqrt(1 + 2 * 9.8 / (x * x) * (h - H - 9.8 * max * max / (2 * x * x)))) / (9.8 * max)) * 180 / np.pi
+z = np.arctan(x * x * (1 - np.sqrt(1 + 2 * 9.8 / (x * x) * (h - H - 9.8 * max * max / (2 * x * x)))) / (9.8 * max)) * 180 / np.pi
+w = np.arctan(x * x * (1 - np.sqrt(1 + 2 * 9.8 / (x * x) * (h - H - 9.8 * min * min / (2 * x * x)))) / (9.8 * min)) * 180 / np.pi
+p = np.arctan(x*x*(1-np.sqrt(1+2*9.8/(x*x)*(h-(H+r)-9.8*max*max/(2*x*x))))/(9.8*max))*180/np.pi
+plt.plot(x, y, color='b', label='Угол от скорости ')
+plt.plot(x, q, color='r', label='Угол от скорости ')
+plt.plot(x, z, color='y', label='Угол от скорости ')
+plt.plot(x, w, color='g', label='Угол от скорости ')
+plt.plot(x, p, color='b', label='Угол от скорости ')
+plt.show()
 
-
-        # Углы для броска с отскоком от щита
+    # Углы для броска с отскоком от щита
 # Первый случай для броска с отскоком
 x = np.arange(L+0.15+r, L+0.15+2*R-r, 0.01)
 y = np.arctan(v*v*(1+np.sqrt(1+2*9.8/(v*v)*(h-H-9.8*x*x/(2*v*v))))/(9.8*x))*180/np.pi
@@ -227,4 +259,3 @@ if (bmax<bmin) and (amax<amin) and (bmax>amax):
         print('Допустимый угол для первого случая броска с отскоком от ', amax, 'до', bmin)
     if (amin>bmax) and (amin>bmin):
         print('Допустимый угол для первого случая броска с отскоком от ', bmax, 'до', bmin)
-#print(bmin,bmax,amin,amax)
